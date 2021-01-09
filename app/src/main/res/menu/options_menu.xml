@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:title="Search"
+        android:id="@+id/search_op"
+        android:icon="@drawable/ic_baseline_search_24"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always">
+    </item>
+
+    <item
+        android:title="Sort by"
+        android:id="@+id/sort_by_op"
+        app:showAsAction="never">
+        <menu>
+            <item
+                android:title="Higher Priority"
+                android:id="@+id/higher_priority_op"
+                app:showAsAction="never">
+            </item>
+
+            <item
+                android:title="Lower Priority"
+                android:id="@+id/lower_priority_op"
+                app:showAsAction="never">
+            </item>
+        </menu>
+    </item>
+
+    <item
+        android:title="Settings"
+        android:id="@+id/setting_op"
+        app:showAsAction="never">
+    </item>
+
+    <item
+        android:title="Logout"
+        android:id="@+id/main_logout"
+        app:showAsAction="never">
+    </item>
+
+</menu>

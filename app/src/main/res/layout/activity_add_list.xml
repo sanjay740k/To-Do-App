@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddListActivity">
+
+
+    <EditText
+        android:id="@+id/editTextTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:hint="Title"
+        android:inputType="textShortMessage"
+        android:textSize="24sp"
+        android:padding="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"/>
+
+    <EditText
+        android:id="@+id/editTextMsg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTextTitle"
+        android:layout_centerHorizontal="true"
+        android:hint="Discription"
+        android:inputType="textMultiLine"
+        android:textSize="24sp"
+        android:padding="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"/>
+
+    <EditText
+        android:id="@+id/editTextDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTextMsg"
+        android:layout_centerInParent="true"
+        android:text="1/1/2021"
+        android:textSize="36sp"
+        android:clickable="true"
+        android:focusable="false"
+        android:inputType="date"
+        android:padding="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"/>
+
+    <EditText
+        android:id="@+id/editTextTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTextDate"
+        android:layout_centerInParent="true"
+        android:text="6:00 AM"
+        android:textSize="36sp"
+        android:clickable="true"
+        android:focusable="false"
+        android:inputType="time"
+        android:padding="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"/>
+
+    <Button
+        android:id="@+id/save"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTextTime"
+        android:padding="4dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="SAVE"
+        android:textAllCaps="false"
+        android:textSize="24sp"
+        android:textColor="@color/cardview_light_background"
+        android:background="@drawable/buttons"/>
+
+    <Button
+        android:id="@+id/delete"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTextTime"
+        android:padding="4dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="UPDATE"
+        android:textAllCaps="false"
+        android:textSize="24sp"
+        android:textColor="@color/cardview_light_background"
+        android:background="@drawable/buttons"/>
+
+
+</RelativeLayout>
