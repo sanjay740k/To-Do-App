@@ -9,10 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,64 +20,43 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    public String currentToDoId;
     private Intent addListIntent;
-    private FloatingActionButton fab;
-    private FirebaseAuth firebaseAuth;
     private List<ToDoList> todoList;
-    private RecyclerView recyclerView;
-    private String Uemail;
-    private DatabaseReference databaseReferenceToDo ,scoresRef;
+    FirebaseAuth firebaseAuth;
+    private DatabaseReference databaseReferenceToDo;
     private FirebaseUser firebaseUser;
-    //public static final String strId = "User_Id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        scoresRef = FirebaseDatabase.getInstance().getReference("Users");
+        String currentToDoId = GetUserId();
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        DatabaseReference scoresRef = FirebaseDatabase.getInstance().getReference("Users").child(currentToDoId);
         scoresRef.keepSynced(true);
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if(firebaseUser != null) {
-            Uemail = firebaseUser.getEmail();
-            currentToDoId = Uemail;
-            currentToDoId = currentToDoId.replace(".", "");
-            currentToDoId = currentToDoId.replace("$", "");
-            currentToDoId = currentToDoId.replace("[", "");
-            currentToDoId = currentToDoId.replace("]", "");
-            currentToDoId = currentToDoId.replace("#", "");
-            currentToDoId = currentToDoId.replace("/", "");
-        }
-        else {
-            currentToDoId = "12345";
-        }
         databaseReferenceToDo = FirebaseDatabase.getInstance().getReference().child("Users").child(currentToDoId);
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addListIntent = new Intent(MainActivity.this, AddListActivity.class);
-                startActivity(addListIntent);
-            }
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(v -> {
+            addListIntent = new Intent(MainActivity.this, AddListActivity.class);
+            startActivity(addListIntent);
         });
 
-        Toolbar toolbar = (androidx.appcompat.widget.Toolbar) findViewById(R.id.app_bar_layout);
+        Toolbar toolbar = findViewById(R.id.app_bar_layout);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("To Do List");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("To Do List");
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         todoList = new ArrayList<>();
@@ -88,54 +65,68 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
+    protected String GetUserId() {
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        String useremail;
+        if(this.firebaseUser != null) {
+            useremail = this.firebaseUser.getEmail();
+            useremail = useremail != null ? useremail.replaceAll("[.$\\[\\]#/]", "") : null;
+        }
+        else {
+            useremail = "12345";
+        }
+        return useremail;
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
         if (firebaseUser == null){
             SendUserToLoginActivity();
         }
-        databaseReferenceToDo.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if(snapshot.exists()){
-                    DisplayMsgs(snapshot);
+        else {
+            databaseReferenceToDo.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    if (snapshot.exists()) {
+                        DisplayMsgs(snapshot);
+                    }
                 }
-            }
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if(snapshot.exists()){
-                    DisplayMsgs(snapshot);
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
                 }
-            }
 
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
 
-            }
+                }
 
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-            }
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+                }
+            });
+        }
     }
 
     private void DisplayMsgs(DataSnapshot snapshot) {
-        Iterator iterator = snapshot.getChildren().iterator();
+        //todoList.clear();
+        Iterator<DataSnapshot> iterator = snapshot.getChildren().iterator();
         String uniqueID = UUID.randomUUID().toString();
         while(iterator.hasNext()) {
-            String curdate = (String) ((DataSnapshot) iterator.next()).getValue();
-            String curtime = (String) ((DataSnapshot) iterator.next()).getValue();
-            String datemsg = (String) ((DataSnapshot) iterator.next()).getValue();
-            String descMsg = (String) ((DataSnapshot) iterator.next()).getValue();
-            String timeMsg = (String) ((DataSnapshot) iterator.next()).getValue();
-            String titlemsg = (String) ((DataSnapshot) iterator.next()).getValue();
+            String curdate = (String) iterator.next().getValue();
+            String curtime = (String) iterator.next().getValue();
+            String datemsg = (String) iterator.next().getValue();
+            String descMsg = (String) iterator.next().getValue();
+            String timeMsg = (String) iterator.next().getValue();
+            String titlemsg = (String) iterator.next().getValue();
             todoList.add(new ToDoList(uniqueID, titlemsg, descMsg, datemsg, timeMsg, curdate, curtime));
         }
     }
@@ -151,16 +142,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         super.onOptionsItemSelected(item);
 
-        if(item.getItemId()==R.id.sort_by_op){
-            return true;
-        }
-        else if(item.getItemId()==R.id.sort_by_op){
-
-        }
-        else if(item.getItemId() == R.id.setting_op){
-
-        }
-        else if(item.getItemId() == R.id.main_logout){
+        if(item.getItemId() == R.id.main_logout){
             firebaseAuth.signOut();
             SendUserToLoginActivity();
         }

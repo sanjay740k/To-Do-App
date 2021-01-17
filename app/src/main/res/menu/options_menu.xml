@@ -3,26 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:title="Search"
+        android:title="@string/search"
         android:id="@+id/search_op"
         android:icon="@drawable/ic_baseline_search_24"
-        app:actionViewClass="androidx.appcompat.widget.SearchView"
-        app:showAsAction="always">
+        app:showAsAction="ifRoom"
+        app:actionViewClass="androidx.appcompat.widget.SearchView">
     </item>
 
     <item
-        android:title="Sort by"
+        android:title="@string/sort_by"
         android:id="@+id/sort_by_op"
         app:showAsAction="never">
         <menu>
             <item
-                android:title="Higher Priority"
+                android:title="@string/higher_priority"
                 android:id="@+id/higher_priority_op"
                 app:showAsAction="never">
             </item>
 
             <item
-                android:title="Lower Priority"
+                android:title="@string/lower_priority"
                 android:id="@+id/lower_priority_op"
                 app:showAsAction="never">
             </item>
@@ -30,13 +30,13 @@
     </item>
 
     <item
-        android:title="Settings"
+        android:title="@string/settings"
         android:id="@+id/setting_op"
         app:showAsAction="never">
     </item>
 
     <item
-        android:title="Logout"
+        android:title="@string/logout"
         android:id="@+id/main_logout"
         app:showAsAction="never">
     </item>

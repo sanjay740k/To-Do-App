@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">To Do App</string>
+    <string name="search">Search</string>
+    <string name="sort_by">Sort by</string>
+    <string name="higher_priority">Higher Priority</string>
+    <string name="lower_priority">Lower Priority</string>
+    <string name="settings">Settings</string>
+    <string name="logout">Logout</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="_01_01_2021">01/01/2021</string>
+    <string name="_06_00_am">06:00 AM</string>
+    <string name="save">SAVE</string>
+    <string name="log_in">Log In!</string>
+    <string name="email">Email…</string>
+    <string name="password">Password…</string>
+    <string name="forgot_password">Forgot Password ?</string>
+    <string name="login">Login</string>
+    <string name="sign_up">Sign Up!</string>
+    <string name="create_account">Create Account</string>
+    <string name="imgtodo">TODO</string>
+    <string name="fabtodo">TODO</string>
 </resources>

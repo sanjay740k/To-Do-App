@@ -1,17 +1,16 @@
 package com.example.todoapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,46 +24,46 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ProductViewHolder> {
+public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.ListViewHolder> {
 
-    private Context context;
-    private List<ToDoList> productList;
-    public ToDoListAdapter(Context mCtx, List<ToDoList> productList) {
-        this.context = mCtx;
-        this.productList = productList;
+    private final Context context;
+    private final List<ToDoList> todoLists;
+    public ToDoListAdapter(Context context, List<ToDoList> todoLists) {
+        this.context = context;
+        this.todoLists = todoLists;
     }
 
     @NonNull
     @Override
-    public ProductViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.to_do_list_adapter, null);
-        return new ProductViewHolder(view);
+        @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.to_do_list_adapter, null);
+        return new ListViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ProductViewHolder holder, int position) {
-        ToDoList product = productList.get(position);
-        holder.textViewTitle.setText(product.getTitle());
-        holder.textViewShortDesc.setText(product.getShortdesc());
-        holder.textViewDater.setText(product.getDater());
-        holder.textViewTimer.setText(product.getTimer());
-        holder.textViewCurrentDate.setText(product.getCurrentDate());
-        holder.textViewCurrentTime.setText(product.getCurrentTime());
+    public void onBindViewHolder(ListViewHolder holder, int position) {
+        ToDoList toDoList = todoLists.get(position);
+        holder.textViewTitle.setText(toDoList.getTitle());
+        holder.textViewShortDesc.setText(toDoList.getShortdesc());
+        holder.textViewDater.setText(toDoList.getDater());
+        holder.textViewTimer.setText(toDoList.getTimer());
+        holder.textViewCurrentDate.setText(toDoList.getCurrentDate());
+        holder.textViewCurrentTime.setText(toDoList.getCurrentTime());
 
-        holder.setListner(product.getTitle());
+        holder.setListener(toDoList.getTitle());
     }
 
     @Override
     public int getItemCount() {
-        return productList.size();
+        return todoLists.size();
     }
-    class ProductViewHolder extends RecyclerView.ViewHolder {
+    class ListViewHolder extends RecyclerView.ViewHolder {
         TextView textViewTitle, textViewShortDesc, textViewTimer, textViewDater, textViewCurrentDate, textViewCurrentTime;
         public ImageView deleteItem;
         int position;
 
-        public ProductViewHolder(View itemView) {
+        public ListViewHolder(View itemView) {
             super(itemView);
 
             textViewTitle = itemView.findViewById(R.id.textViewTitle);
@@ -74,53 +73,61 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.Produc
             textViewCurrentDate = itemView.findViewById(R.id.textViewCurrentDate);
             textViewCurrentTime = itemView.findViewById(R.id.textViewCurrentTime);
             deleteItem = itemView.findViewById(R.id.deleteButoon);
+
+            itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(context, AddListActivity.class);
+                intent.putExtra("title", textViewTitle.getText().toString());
+                intent.putExtra("desc", textViewShortDesc.getText().toString());
+                intent.putExtra("date", textViewDater.getText().toString());
+                intent.putExtra("time", textViewTimer.getText().toString());
+                context.startActivity(intent);
+            });
         }
 
-        public void setListner(String curTitle){
-            deleteItem.setOnClickListener(new View.OnClickListener() {
+        public void setListener(String curTitle){
+            deleteItem.setOnClickListener(v -> {
+                position = getAdapterPosition();
+                removeItemFromList(position);
+                removeItemFromFirebase(curTitle);
+            });
+        }
+    }
+
+    private void removeItemFromFirebase(String curTitle) {
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        String currentToDoId;
+        if(firebaseUser != null) {
+            currentToDoId = firebaseUser.getEmail();
+            currentToDoId = currentToDoId != null ? currentToDoId.replaceAll("[.$\\[\\]#/]", "") : null;
+        }
+        else {
+            currentToDoId = "12345";
+        }
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        Query query = null;
+        if (currentToDoId != null) {
+            query = ref.child("Users").child(currentToDoId).orderByChild("title").equalTo(curTitle);
+        }
+
+        if (query != null) {
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onClick(View v) {
-                    position = getAdapterPosition();
-                    removeItem(position);
-                    FirebaseUser firebaseUser = FirebaseAuth.getInstance().getInstance().getCurrentUser();
-                    String currentToDoId;
-                    if(firebaseUser != null) {
-                        currentToDoId = firebaseUser.getEmail();
-                        currentToDoId = currentToDoId.replace(".", "");
-                        currentToDoId = currentToDoId.replace("$", "");
-                        currentToDoId = currentToDoId.replace("[", "");
-                        currentToDoId = currentToDoId.replace("]", "");
-                        currentToDoId = currentToDoId.replace("#", "");
-                        currentToDoId = currentToDoId.replace("/", "");
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
+                        appleSnapshot.getRef().removeValue();
                     }
-                    else {
-                        currentToDoId = "12345";
-                    }
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                    Query query = ref.child("Users").child(currentToDoId).orderByChild("title").equalTo(curTitle);
+                }
 
-                    query.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot appleSnapshot: dataSnapshot.getChildren()) {
-                                appleSnapshot.getRef().removeValue();
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            Log.e("TAG", "onCancelled", databaseError.toException());
-                        }
-                    });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.e("TAG", "onCancelled", databaseError.toException());
                 }
             });
         }
     }
 
-    private void removeItem(int position) {
-        productList.remove(position);
+    private void removeItemFromList(int position) {
+        todoLists.remove(position);
         notifyItemRemoved(position);
     }
-
-
 }
